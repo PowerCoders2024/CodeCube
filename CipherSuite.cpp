@@ -11,9 +11,10 @@
 #include <cstddef> // for std::byte
 #include <array>
 
-const int THREAD_POOL_SIZE = 100;
-const int AUTH_TAG_SIZE = 16;
-const int IV_SIZE = 16;
+#define THREAD_POOL_SIZE 100
+
+#define AUTH_TAG_SIZE 16
+#define IV_SIZE 16
 
 CipherSuite::CipherSuite()
 {
@@ -24,6 +25,8 @@ void CipherSuite::initializeCipherSuite()
 {
 	// Inicialización del constructor
 	std::cout << "cipher init" << std::endl;
+
+	// Cambiar el IV por uno generado aleatoriamente
 	byte ivGen[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
 	std::memcpy(this->iv, ivGen, 16);
 }
@@ -40,8 +43,7 @@ void encrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *ciph
 				   int &active_threads)
 {
 	{
-		std::unique_lock lock(mtx);
-		// std::unique_lock<std::mutex> lock(mtx);
+		std::unique_lock<std::mutex> lock(mtx);
 		cv.wait(lock, [&]
 				{ return active_threads < THREAD_POOL_SIZE; });
 		++active_threads;
@@ -61,7 +63,7 @@ void encrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *ciph
 	}
 
 	{
-		std::scoped_lock<std::mutex> lock(mtx);
+		std::lock_guard<std::mutex> lock(mtx);
 		--active_threads;
 		cv.notify_all();
 	}
@@ -72,8 +74,7 @@ void decrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *decr
 				   int &active_threads)
 {
 	{
-		std::unique_lock lock(mtx);
-		// std::unique_lock<std::mutex> lock(mtx);
+		std::unique_lock<std::mutex> lock(mtx);
 		cv.wait(lock, [&]
 				{ return active_threads < THREAD_POOL_SIZE; });
 		++active_threads;
@@ -91,7 +92,7 @@ void decrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *decr
 	}
 
 	{
-		std::scoped_lock<std::mutex> lock(mtx);
+		std::lock_guard<std::mutex> lock(mtx);
 		--active_threads;
 		cv.notify_all();
 	}
@@ -119,16 +120,17 @@ void CipherSuite::encryptAES(byte key[], const std::string &input_path, const st
 	std::mutex mtx;
 	std::condition_variable cv;
 	int active_threads = 0;
-	std::vector<std::jthread> threads;
+	const int max_threads = THREAD_POOL_SIZE;
+	std::vector<std::thread> threads;
 
 	for (int i = 0; i < THREAD_POOL_SIZE; i++)
 	{
 		size_t current_block_size = (i == THREAD_POOL_SIZE - 1) ? last_block_size : block_size;
 
-		std::vector<std::byte> buffer(current_block_size);
+		std::vector<byte> buffer(current_block_size);
 
-		std::array<std::byte, IV_SIZE> iv;
-		std::array<std::byte, AUTH_TAG_SIZE> authTag;
+		std::array<byte, IV_SIZE> iv;
+		std::array<byte, AUTH_TAG_SIZE> authTag;
 
 		infile.read(reinterpret_cast<char *>(buffer.data()), current_block_size);
 		const size_t read_size = infile.gcount();
@@ -136,7 +138,7 @@ void CipherSuite::encryptAES(byte key[], const std::string &input_path, const st
 		if (read_size == 0)
 			break; // No more data to read
 
-		std::vector<std::byte> cipher_block(read_size);
+		std::vector<byte> cipher_block(read_size);
 
 		threads.emplace_back(encrypt_block, std::ref(*this), key, buffer.data(), cipher_block.data(), iv.data(),
 							 authTag.data(), std::ref(read_size), std::ref(i), std::ref(mtx), std::ref(cv),
@@ -191,16 +193,17 @@ void CipherSuite::decryptAES(byte key[], const std::string &input_path, const st
 	std::mutex mtx;
 	std::condition_variable cv;
 	int active_threads = 0;
-	std::vector<std::jthread> threads;
+	const int max_threads = THREAD_POOL_SIZE;
+	std::vector<std::thread> threads;
 
 	for (int i = 0; i < THREAD_POOL_SIZE; i++)
 	{
 		size_t current_block_size = (i == THREAD_POOL_SIZE - 1) ? last_block_size : block_size;
 
-		std::vector<std::byte> buffer(current_block_size);
-		std::vector<std::byte> decrypted_block(current_block_size);
-		std::array<std::byte, IV_SIZE> iv;
-		std::array<std::byte, AUTH_TAG_SIZE> authTag;
+		std::vector<byte> buffer(current_block_size);
+		std::vector<byte> decrypted_block(current_block_size);
+		std::array<byte, IV_SIZE> iv;
+		std::array<byte, AUTH_TAG_SIZE> authTag;
 
 		infile.read(reinterpret_cast<char *>(iv.data()), IV_SIZE);
 		infile.read(reinterpret_cast<char *>(authTag.data()), AUTH_TAG_SIZE);
@@ -244,14 +247,14 @@ int CipherSuite::PSKKeyGenerator(byte *pskKey, int keySize)
 	int ret = wc_InitRng(&rng);
 	if (ret != 0)
 	{
-		std::print("Error initializing RNG: %d\n", ret);
+		printf("Error initializing RNG: %d\n", ret);
 		return ret;
 	}
 
 	ret = wc_RNG_GenerateBlock(&rng, pskKey, keySize);
 	if (ret != 0)
 	{
-		std::print("Error generating PSK key: %d\n", ret);
+		printf("Error generating PSK key: %d\n", ret);
 		wc_FreeRng(&rng);
 		return ret;
 	}

@@ -10,12 +10,12 @@ void EarthBase::initializeEarthBase()
 	WOLFSSL_CTX *ctx = wolfSSL_CTX_new(wolfTLS_client_method());
 	if (ctx == nullptr)
 	{
-		std::print("wolfSSL_CTX_new error.\n");
+		printf("wolfSSL_CTX_new error.\n");
 	}
 	this->ssl = wolfSSL_new(ctx);
 	if (this->ssl == nullptr)
 	{
-		std::print("wolfSSL_new error.\n");
+		printf("wolfSSL_new error.\n");
 	}
 }
 
@@ -49,9 +49,9 @@ void EarthBase::sendIdentity(Satellite satellite)
 		std::cout << "Clave PSK  usar : ";
 		for (int i = 0; i < sizeof(this->pskKey); i++)
 		{
-			std::print("%02x", pskKey[i]);
+			printf("%02x", pskKey[i]);
 		}
-		std::print("\n");
+		printf("\n");
 		// Enviar ultimo mensaje encriptado con la psk y termina
 	}
 	else

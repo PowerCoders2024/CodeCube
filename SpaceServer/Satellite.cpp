@@ -39,8 +39,8 @@ int Satellite::initializeSatellite()
 	}
 
 	this->ssl = wolfSSL_new(ctx);
-	std::print("%p", this->ssl); // Fix: Change the argument to a valid format
-								 // specifier for a pointer
+	printf("%p", this->ssl); // Fix: Change the argument to a valid format
+							 // specifier for a pointer
 	if (this->ssl == nullptr)
 	{
 		std::cerr << "Error creando la nueva sesión SSL" << std::endl;
@@ -64,9 +64,9 @@ unsigned int Satellite::verifyClientIdentity(WOLFSSL *ssl, const char *identity)
 		std::cout << "PSK key: ";
 		for (int i = 0; i < sizeof(this->pskKey); i++)
 		{
-			std::print("%02x", pskKey[i]);
+			printf("%02x", pskKey[i]);
 		}
-		std::print("\n");
+		printf("\n");
 		return sizeof(this->pskKey);
 	}
 	return 0; // No coincide la identidad
