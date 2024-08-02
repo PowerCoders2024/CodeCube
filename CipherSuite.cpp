@@ -23,7 +23,7 @@ void CipherSuite::initializeCipherSuite()
 {
 	// Inicialización del constructor
 	std::cout << "cipher init" << std::endl;
-	std::vector<byte> ivGen = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+	std::vector<std::byte> ivGen = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
 	std::memcpy(this->iv, ivGen, 16);
 }
 
@@ -125,10 +125,10 @@ void CipherSuite::encryptAES(std::vector<byte> key, const std::string &input_pat
 	{
 		size_t current_block_size = (i == THREAD_POOL_SIZE - 1) ? last_block_size : block_size;
 
-		std::vector<byte> buffer(current_block_size);
+		std::vector<std::byte> buffer(current_block_size);
 
-		std::array<byte, IV_SIZE> iv;
-		std::array<byte, AUTH_TAG_SIZE> authTag;
+		std::array<std::byte, IV_SIZE> iv;
+		std::array<std::byte, AUTH_TAG_SIZE> authTag;
 
 		infile.read(reinterpret_cast<char *>(buffer.data()), current_block_size);
 		const size_t read_size = infile.gcount();
@@ -136,7 +136,7 @@ void CipherSuite::encryptAES(std::vector<byte> key, const std::string &input_pat
 		if (read_size == 0)
 			break; // No more data to read
 
-		std::vector<byte> cipher_block(read_size);
+		std::vector<std::byte> cipher_block(read_size);
 
 		threads.emplace_back(encrypt_block, std::ref(*this), key, buffer.data(), cipher_block.data(), iv.data(),
 							 authTag.data(), std::ref(read_size), std::ref(i), std::ref(mtx), std::ref(cv),
@@ -198,10 +198,10 @@ void CipherSuite::decryptAES(std::vector<byte> key, const std::string &input_pat
 	{
 		size_t current_block_size = (i == THREAD_POOL_SIZE - 1) ? last_block_size : block_size;
 
-		std::vector<byte> buffer(current_block_size);
-		std::vector<byte> decrypted_block(current_block_size);
-		std::array<byte, IV_SIZE> iv;
-		std::array<byte, AUTH_TAG_SIZE> authTag;
+		std::vector<std::byte> buffer(current_block_size);
+		std::vector<std::byte> decrypted_block(current_block_size);
+		std::array<std::byte, IV_SIZE> iv;
+		std::array<std::byte, AUTH_TAG_SIZE> authTag;
 
 		infile.read(reinterpret_cast<char *>(iv.data()), IV_SIZE);
 		infile.read(reinterpret_cast<char *>(authTag.data()), AUTH_TAG_SIZE);
