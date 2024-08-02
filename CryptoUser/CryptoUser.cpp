@@ -1,7 +1,7 @@
 #include "CryptoUser.h"
 
 #include "../CipherSuite.h"
-std::vector<std::byte, 16> CryptoUser::pskKey = = {0};
+std::vector<std::byte, 16> CryptoUser::pskKey = std::vector<std::byte>(16, std::byte{0});
 // byte CryptoUser::pskKey[16] = {0};
 CryptoUser::CryptoUser()
 {
@@ -30,12 +30,12 @@ void CryptoUser::setKeySession(ecc_key userPub)
 	memcpy(keySession + 16, pskKey, 16);
 }
 
-void CryptoUser::encryptMessage(std::vector<byte> key, const std::string &input_path, const std::string &output_path)
+void CryptoUser::encryptMessage(byte key[], const std::string &input_path, const std::string &output_path)
 {
 	this->cipher_suite.encryptAES(key, input_path, output_path);
 }
 
-void CryptoUser::decryptMessage(std::vector<byte> key, const std::string &input_path, const std::string &output_path)
+void CryptoUser::decryptMessage(byte key[], const std::string &input_path, const std::string &output_path)
 {
 	this->cipher_suite.decryptAES(key, input_path, output_path);
 }

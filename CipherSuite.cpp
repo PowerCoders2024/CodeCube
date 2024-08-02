@@ -23,7 +23,7 @@ void CipherSuite::initializeCipherSuite()
 {
 	// Inicialización del constructor
 	std::cout << "cipher init" << std::endl;
-	std::vector<std::byte> ivGen = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+	byte ivGen[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
 	std::memcpy(this->iv, ivGen, 16);
 }
 
@@ -96,7 +96,7 @@ void decrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *decr
 	}
 }
 
-void CipherSuite::encryptAES(std::vector<byte> key, const std::string &input_path, const std::string &output_path)
+void CipherSuite::encryptAES(byte key[], const std::string &input_path, const std::string &output_path)
 {
 	wc_AesInit(&this->aes, NULL, 0);
 	wc_AesGcmSetKey(&this->aes, key, 32);
@@ -166,7 +166,7 @@ void CipherSuite::encryptAES(std::vector<byte> key, const std::string &input_pat
 	outfile.close();
 }
 
-void CipherSuite::decryptAES(std::vector<byte> key, const std::string &input_path, const std::string &output_path)
+void CipherSuite::decryptAES(byte key[], const std::string &input_path, const std::string &output_path)
 {
 	wc_AesInit(&this->aes, NULL, 0);
 	wc_AesGcmSetKey(&this->aes, key, 32);

@@ -30,8 +30,8 @@ public:
 	void initializeCryptoUser();
 	ecc_key getPub() const;
 	void setKeySession(ecc_key userPub);
-	void encryptMessage(std::vector<byte> key, const std::string &input_path, const std::string &output_path);
-	void decryptMessage(std::vector<byte> key, const std::string &input_path, const std::string &output_path);
+	void encryptMessage(byte key[], const std::string &input_path, const std::string &output_path);
+	void decryptMessage(byte key[], const std::string &input_path, const std::string &output_path);
 };
 
 #endif // CRYPTOUSER_H
