@@ -39,7 +39,8 @@ void encrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *ciph
 				   int &active_threads)
 {
 	{
-		std::unique_lock<std::mutex> lock(mtx);
+		std::unique_lock lock(mtx);
+		// std::unique_lock<std::mutex> lock(mtx);
 		cv.wait(lock, [&]
 				{ return active_threads < THREAD_POOL_SIZE; });
 		++active_threads;
@@ -70,7 +71,8 @@ void decrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *decr
 				   int &active_threads)
 {
 	{
-		std::unique_lock<std::mutex> lock(mtx);
+		std::unique_lock lock(mtx);
+		// std::unique_lock<std::mutex> lock(mtx);
 		cv.wait(lock, [&]
 				{ return active_threads < THREAD_POOL_SIZE; });
 		++active_threads;
