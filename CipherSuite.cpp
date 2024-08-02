@@ -8,6 +8,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <cstddef> // for std::byte
 
 const int THREAD_POOL_SIZE = 100;
 const int AUTH_TAG_SIZE = 16;
@@ -15,12 +16,6 @@ const int IV_SIZE = 16;
 
 CipherSuite::CipherSuite()
 {
-	/* std::cout << "cipher init" << std::endl;
-
-	byte ivGen[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-					0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
-	std::memcpy(this->iv, ivGen, IV_SIZE); */
-
 	wc_InitRng(&this->rng);
 }
 
@@ -28,11 +23,8 @@ void CipherSuite::initializeCipherSuite()
 {
 	// Inicialización del constructor
 	std::cout << "cipher init" << std::endl;
-
-	// TODO: Cambiar el IV por uno generado aleatoriamente
-	byte ivGen[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+	std::vector<byte> ivGen = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
 	std::memcpy(this->iv, ivGen, 16);
-	// wc_Initng(&this->rng);
 }
 
 void CipherSuite::keyGenerator(ecc_key &key)
@@ -53,7 +45,6 @@ void encrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *ciph
 		++active_threads;
 	}
 
-	/* std::cout << "Encrypting thread #" << thread_id << ":..." << std::endl; */
 	Aes aes;
 	wc_AesInit(&aes, NULL, 0);
 	wc_AesGcmSetKey(&aes, key, 32);
@@ -66,10 +57,9 @@ void encrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *ciph
 	{
 		std::cout << "Encryption error: " << ret << std::endl;
 	}
-	/* std::cout << "Encrypted thread #" << thread_id << std::endl; */
 
 	{
-		std::lock_guard<std::mutex> lock(mtx);
+		std::scoped_lock<std::mutex> lock(mtx);
 		--active_threads;
 		cv.notify_all();
 	}
@@ -86,7 +76,6 @@ void decrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *decr
 		++active_threads;
 	}
 
-	/* std::cout << "Decrypting thread #" << thread_id << ":..." << std::endl; */
 	Aes aes;
 	wc_AesInit(&aes, NULL, 0);
 	wc_AesGcmSetKey(&aes, key, 32);
@@ -97,16 +86,15 @@ void decrypt_block(CipherSuite &cipherSuite, byte *key, byte *buffer, byte *decr
 	{
 		std::cout << "Decryption error: " << ret << std::endl;
 	}
-	/* std::cout << "Decrypted thread #" << thread_id << std::endl; */
 
 	{
-		std::lock_guard<std::mutex> lock(mtx);
+		std::scoped_lock<std::mutex> lock(mtx);
 		--active_threads;
 		cv.notify_all();
 	}
 }
 
-void CipherSuite::encryptAES(byte key[], const std::string &input_path, const std::string &output_path)
+void CipherSuite::encryptAES(std::vector<byte> key, const std::string &input_path, const std::string &output_path)
 {
 	wc_AesInit(&this->aes, NULL, 0);
 	wc_AesGcmSetKey(&this->aes, key, 32);
@@ -129,7 +117,7 @@ void CipherSuite::encryptAES(byte key[], const std::string &input_path, const st
 	std::condition_variable cv;
 	int active_threads = 0;
 	const int max_threads = THREAD_POOL_SIZE;
-	std::vector<std::thread> threads;
+	std::vector<std::jthread> threads;
 
 	for (int i = 0; i < THREAD_POOL_SIZE; i++)
 	{
@@ -177,7 +165,7 @@ void CipherSuite::encryptAES(byte key[], const std::string &input_path, const st
 	outfile.close();
 }
 
-void CipherSuite::decryptAES(byte key[], const std::string &input_path, const std::string &output_path)
+void CipherSuite::decryptAES(std::vector<byte> key, const std::string &input_path, const std::string &output_path)
 {
 	wc_AesInit(&this->aes, NULL, 0);
 	wc_AesGcmSetKey(&this->aes, key, 32);
@@ -213,10 +201,6 @@ void CipherSuite::decryptAES(byte key[], const std::string &input_path, const st
 		std::array<byte, IV_SIZE> iv;
 		std::array<byte, AUTH_TAG_SIZE> authTag;
 
-		/* void decrypt_block(CipherSuite& cipherSuite, byte* key, byte* buffer,
-						   byte* decrypted_block, byte* iv, byte* authTag,
-						   const size_t& read_size, int& thread_id, std::mutex& mtx,
-						   std::condition_variable& cv, int& active_threads)  */
 		infile.read(reinterpret_cast<char *>(iv.data()), IV_SIZE);
 		infile.read(reinterpret_cast<char *>(authTag.data()), AUTH_TAG_SIZE);
 		infile.read(reinterpret_cast<char *>(buffer.data()), current_block_size);
