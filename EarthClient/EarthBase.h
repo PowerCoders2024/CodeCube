@@ -5,7 +5,9 @@
 #include "../SpaceServer/Satellite.h"
 
 #include <wolfssl/ssl.h>
-class EarthBase : public CryptoUser {
+#include <cstddef> // for std::byte
+class EarthBase : public CryptoUser
+{
 	const char *client_identity = "earth_identity";
 	const char *server_hint = "satellite_identity";
 
@@ -17,4 +19,4 @@ public:
 	void sendIdentity(Satellite satellite);
 };
 
-#endif	// EARTHBASE_H
+#endif // EARTHBASE_H

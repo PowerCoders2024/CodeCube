@@ -10,7 +10,7 @@ int Satellite::initializeSatellite()
 	this->ssl = nullptr;
 	WOLFSSL_CTX *ctx = nullptr;
 
-	// Crear contexto y método
+	// Crea contexto y método
 	WOLFSSL_METHOD *method = wolfTLS_server_method();
 	if (method == nullptr)
 	{
@@ -39,8 +39,8 @@ int Satellite::initializeSatellite()
 	}
 
 	this->ssl = wolfSSL_new(ctx);
-	printf("%p", this->ssl); // Fix: Change the argument to a valid format
-							 // specifier for a pointer
+	std::print("%p", this->ssl); // Fix: Change the argument to a valid format
+								 // specifier for a pointer
 	if (this->ssl == nullptr)
 	{
 		std::cerr << "Error creando la nueva sesión SSL" << std::endl;

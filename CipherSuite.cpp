@@ -118,7 +118,6 @@ void CipherSuite::encryptAES(std::vector<byte> key, const std::string &input_pat
 	std::mutex mtx;
 	std::condition_variable cv;
 	int active_threads = 0;
-	const int max_threads = THREAD_POOL_SIZE;
 	std::vector<std::jthread> threads;
 
 	for (int i = 0; i < THREAD_POOL_SIZE; i++)
@@ -191,7 +190,6 @@ void CipherSuite::decryptAES(std::vector<byte> key, const std::string &input_pat
 	std::mutex mtx;
 	std::condition_variable cv;
 	int active_threads = 0;
-	const int max_threads = THREAD_POOL_SIZE;
 	std::vector<std::jthread> threads;
 
 	for (int i = 0; i < THREAD_POOL_SIZE; i++)

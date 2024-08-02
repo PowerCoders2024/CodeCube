@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <cstddef> // for std::byte
 
 #include "../CipherSuite.h"
 

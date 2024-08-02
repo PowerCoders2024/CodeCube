@@ -156,8 +156,6 @@ void decrypt(const std::string &input_path, const std::string &output_path)
 		std::cout << "File " << "shared_key.bin" << " deleted successfully" << std::endl;
 	}
 
-	/* earth_base.setKeySession(*pubEarth); */
-
 	earth_base.decryptMessage(shared_key, input_path, output_path);
 	std::cout << "Decryption completed" << std::endl;
 

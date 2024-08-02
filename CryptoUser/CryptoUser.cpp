@@ -1,12 +1,10 @@
 #include "CryptoUser.h"
 
 #include "../CipherSuite.h"
-std::vector<byte, 16> CryptoUser::pskKey = = {0};
+std::vector<std::byte, 16> CryptoUser::pskKey = = {0};
 // byte CryptoUser::pskKey[16] = {0};
 CryptoUser::CryptoUser()
 {
-	// std::cout << "Claves generadas correctamente" << std::endl;
-	// this->cipher_suite.keyGenerator(this->priv );
 	// Generar PSK si no se ha generado aún
 	if (pskKey[0] == 0)
 	{

@@ -12,19 +12,20 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <cstddef> // for std::byte
 
 class CipherSuite
 {
 public:
 	Aes aes;
-	byte iv[16];
-	byte authIn[16] = {0};
+	std::vector<std::byte, 16> key iv;
+	std::vector<std::byte, 16> authIn = {0};
 	WC_RNG rng;
-	static byte pskKey[16];
+	static std::vector<std::byte, 16> pskKey;
 
 	CipherSuite();
-	void encryptAES(std::vector<byte> key, const std::string &input_path, const std::string &output_path);
-	void decryptAES(std::vector<byte> key, const std::string &input_path, const std::string &output_path);
+	void encryptAES(std::vector<std::byte> key, const std::string &input_path, const std::string &output_path);
+	void decryptAES(std::vector<std::byte> key, const std::string &input_path, const std::string &output_path);
 	void keyGenerator(ecc_key &key);
 	static int PSKKeyGenerator(byte *pskKey, int keySize);
 	void initializeCipherSuite();

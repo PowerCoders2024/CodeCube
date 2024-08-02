@@ -49,7 +49,7 @@ void EarthBase::sendIdentity(Satellite satellite)
 		std::cout << "Clave PSK  usar : ";
 		for (int i = 0; i < sizeof(this->pskKey); i++)
 		{
-			printf("%02x", pskKey[i]);
+			std::print("%02x", pskKey[i]);
 		}
 		std::print("\n");
 		// Enviar ultimo mensaje encriptado con la psk y termina
