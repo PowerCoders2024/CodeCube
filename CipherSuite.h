@@ -13,7 +13,8 @@
 #include <string>
 #include <vector>
 
-class CipherSuite {
+class CipherSuite
+{
 public:
 	Aes aes;
 	byte iv[16];
@@ -22,11 +23,11 @@ public:
 	static byte pskKey[16];
 
 	CipherSuite();
-	void encryptAES(byte key[], const std::string &input_path, const std::string &output_path);
-	void decryptAES(byte key[], const std::string &input_path, const std::string &output_path);
+	void encryptAES(std::vector<byte> key, const std::string &input_path, const std::string &output_path);
+	void decryptAES(std::vector<byte> key, const std::string &input_path, const std::string &output_path);
 	void keyGenerator(ecc_key &key);
 	static int PSKKeyGenerator(byte *pskKey, int keySize);
 	void initializeCipherSuite();
 };
 
-#endif	// CIPHERSUITE_H
+#endif // CIPHERSUITE_H

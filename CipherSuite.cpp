@@ -192,7 +192,7 @@ void CipherSuite::decryptAES(std::vector<byte> key, const std::string &input_pat
 	std::condition_variable cv;
 	int active_threads = 0;
 	const int max_threads = THREAD_POOL_SIZE;
-	std::vector<std::thread> threads;
+	std::vector<std::jthread> threads;
 
 	for (int i = 0; i < THREAD_POOL_SIZE; i++)
 	{
@@ -245,14 +245,14 @@ int CipherSuite::PSKKeyGenerator(byte *pskKey, int keySize)
 	int ret = wc_InitRng(&rng);
 	if (ret != 0)
 	{
-		printf("Error initializing RNG: %d\n", ret);
+		std::print("Error initializing RNG: %d\n", ret);
 		return ret;
 	}
 
 	ret = wc_RNG_GenerateBlock(&rng, pskKey, keySize);
 	if (ret != 0)
 	{
-		printf("Error generating PSK key: %d\n", ret);
+		std::print("Error generating PSK key: %d\n", ret);
 		wc_FreeRng(&rng);
 		return ret;
 	}
