@@ -127,7 +127,7 @@ void decrypt(const std::string &input_path, const std::string &output_path)
 	std::cout << "input_path=" << input_path << std::endl;
 	std::cout << "output_path=" << output_path << std::endl;
 
-	bye shared_key[32];
+	byte shared_key[32];
 
 	std::ifstream file("shared_key.bin", std::ios::binary);
 	if (!file)
