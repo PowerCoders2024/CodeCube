@@ -9,6 +9,7 @@
 #include <thread>
 #include <vector>
 #include <cstddef> // for std::byte
+#include <array>
 
 const int THREAD_POOL_SIZE = 100;
 const int AUTH_TAG_SIZE = 16;
