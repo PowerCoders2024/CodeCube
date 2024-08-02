@@ -9,10 +9,10 @@
 #include <thread>
 #include <vector>
 
-#define const THREAD_POOL_SIZE 100
+#define THREAD_POOL_SIZE 100
 
-#define const AUTH_TAG_SIZE 16
-#define const IV_SIZE 16
+#define AUTH_TAG_SIZE 16
+#define IV_SIZE 16
 
 CipherSuite::CipherSuite()
 {
