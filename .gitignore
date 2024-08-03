@@ -1,0 +1,20 @@
+# Workspace files
+.vscode/
+.clang-format
+
+# Testing files
+*.jpg
+*.jpeg
+*.png
+*.txt
+*.bin
+*.in
+*.tif
+
+# Executable files
+*.out
+
+#Library files
+libraries/*/
+libraries/*.zip
+

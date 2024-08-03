@@ -4,22 +4,31 @@
 
 EarthBase::EarthBase() : CryptoUser() {}
 
-void EarthBase::initializeEarthBase()
+unsigned int EarthBase::initializeEarthBase()
 {
 	std::cout << "Client: Client Hello" << " Communication established -->" << std::endl;
 	WOLFSSL_CTX *ctx = wolfSSL_CTX_new(wolfTLS_client_method());
 	if (ctx == nullptr)
 	{
 		printf("wolfSSL_CTX_new error.\n");
+		return 0;
 	}
 	this->ssl = wolfSSL_new(ctx);
 	if (this->ssl == nullptr)
 	{
 		printf("wolfSSL_new error.\n");
+		return 0;
 	}
+	return 1;
 }
 
-unsigned int EarthBase::receiveServerHint(Satellite satellite)
+/**
+ * @brief Recibe el hint del servidor.
+ *
+ * @param satellite Objeto Satellite para la comunicación.
+ * @return unsigned int Tamaño de la clave PSK si el hint es reconocido, 0 en caso contrario.
+ */
+unsigned int EarthBase::receiveServerHint(Satellite &satellite)
 {
 	std::cout << "<-- Server: Server Hello (ServerExchange Hint)" << std::endl;
 	const char *idHintRetrieved = wolfSSL_get_psk_identity_hint(satellite.ssl);
@@ -36,12 +45,16 @@ unsigned int EarthBase::receiveServerHint(Satellite satellite)
 	return sizeof(this->pskKey);
 }
 
-void EarthBase::sendIdentity(Satellite satellite)
+/**
+ * @brief Envía la identidad del cliente al servidor.
+ *
+ * @param satellite Objeto Satellite para la comunicación.
+ * @return unsigned int 1 si la autenticación PSK fue exitosa, 0 en caso contrario.
+ */
+unsigned int EarthBase::sendIdentity(Satellite &satellite)
 {
 	std::cout << "Client: Client Exchange Identity -->  " << std::endl;
-
 	unsigned int clientVerify = satellite.verifyClientIdentity(this->ssl, this->client_identity);
-
 	if (clientVerify > 0)
 	{
 		std::cout << "Client: Finished (client) -->" << std::endl;
@@ -57,5 +70,7 @@ void EarthBase::sendIdentity(Satellite satellite)
 	else
 	{
 		std::cout << "Autenticación PSK fallida.";
+		return 0;
 	}
+	return 1;
 }

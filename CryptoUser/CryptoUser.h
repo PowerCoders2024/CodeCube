@@ -10,19 +10,16 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
-#include <cstddef> // for std::byte
 
 #include "../CipherSuite.h"
 
-class CryptoUser
-{
+class CryptoUser {
 	ecc_key priv, pub;
 
 public:
 	byte keySession[AES_256_KEY_SIZE];
 	word32 keySessionSz = AES_256_KEY_SIZE;
 	CipherSuite cipher_suite = CipherSuite();
-	;
 	static byte pskKey[16];
 
 	CryptoUser();
@@ -34,4 +31,4 @@ public:
 	void decryptMessage(byte key[], const std::string &input_path, const std::string &output_path);
 };
 
-#endif // CRYPTOUSER_H
+#endif	// CRYPTOUSER_H
