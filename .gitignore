@@ -18,3 +18,5 @@
 libraries/*/
 libraries/*.zip
 
+#Make files
+Google_tests/NewTests/build/
